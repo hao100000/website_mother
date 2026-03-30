@@ -6,7 +6,12 @@
 <title>機能 | Sample SaaS</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
-body{min-height:100vh;background:linear-gradient(135deg,#f5f9ff,#ffffff);color:#1a1a1a;display:flex;align-items:center;justify-content:center;padding:40px;}
+body{min-height:100vh;background:linear-gradient(135deg,#f5f9ff,#ffffff);color:#1a1a1a;display:flex;align-items:center;justify-content:center;padding:40px 40px 40px 300px;}
+.sidebar{position:fixed;top:0;left:0;width:260px;height:100vh;background:#1f2937;color:#fff;padding:20px;overflow:auto;}
+.sidebar .logo{font-size:20px;margin-bottom:30px;color:#fff;}
+.menu{list-style:none;padding:0;}
+.menu a{display:block;color:#fff;text-decoration:none;padding:12px 10px;margin-bottom:8px;border-radius:6px;}
+.menu a:hover{background:#374151;}
 .card{max-width:760px;width:100%;background:#fff;border:1px solid #e5e7eb;border-radius:24px;box-shadow:0 20px 60px rgba(15,23,42,0.08);padding:48px;}
 .eyebrow{color:#2b6df6;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;}
 h1{font-size:40px;margin-bottom:16px;}
@@ -18,6 +23,22 @@ p{font-size:16px;line-height:1.8;color:#4b5563;margin-bottom:28px;}
 </style>
 </head>
 <body>
+  <aside class="sidebar">
+    <h2 class="logo">SampleSaaS</h2>
+    <ul class="menu">
+      <li><a href="apply.html">申請する</a></li>
+      <li><a href="proxy-apply.html">代理申請する</a></li>
+      <li><a href="my-applications.html">自分の申請</a></li>
+      <li><a href="approvals.html">承認する</a></li>
+      <li><a href="proxy-approvals.html">代理承認する</a></li>
+      <li><a href="viewable-applications.html">閲覧できる申請</a></li>
+      <li><a href="invoices.html">回収した請求書</a></li>
+      <li><a href="all-applications.html">すべての申請</a></li>
+      <li><a href="routes-forms.html">経路・フォーム</a></li>
+      <li><a href="admin-settings.html">管理者設定</a></li>
+      <li><a href="accounting-features.html">経理機能</a></li>
+    </ul>
+  </aside>
   <main class="card">
     <div class="eyebrow">Product</div>
     <h1>機能</h1>

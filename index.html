@@ -7,6 +7,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
 body{color:#1a1a1a;line-height:1.7;background:#fff;}
+body{padding-left:260px;}
 header{display:flex;justify-content:space-between;align-items:center;padding:20px 60px;}
 .logo{font-weight:700;font-size:22px;color:#2b6df6;}
 nav a{margin-left:24px;text-decoration:none;color:#333;font-size:14px;}
@@ -66,8 +67,17 @@ body{
 }
 
 .main{
-  margin-left:260px;
   padding:40px;
+}
+
+@media (max-width: 900px){
+  body{padding-left:0;}
+  .sidebar{position:static;width:auto;height:auto;}
+  .main{padding:20px;}
+  header,.hero,.section,.cta,footer{padding-left:20px;padding-right:20px;}
+  .hero{flex-direction:column;gap:24px;}
+  .hero img{width:100%;}
+  .features{flex-direction:column;}
 }
 </style>
 </head>
