@@ -226,7 +226,7 @@ textarea{min-height:140px;resize:vertical;}
     };
 
     const buildCsv = (invoice) => {
-      const headers = ['company', 'invoiceNo', 'issueDate', 'dueDate', 'amount', 'tax', 'subject', 'details'];
+      const headers = ['取引先名', '請求番号', '発行日', '支払期限', '請求金額', '税区分', '件名', '明細'];
       const values = [
         invoice.company,
         invoice.invoiceNo,
