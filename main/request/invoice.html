@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>請求書を作成 | Sample SaaS</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
+body{min-height:100vh;background:linear-gradient(135deg,#f5f9ff,#ffffff);color:#1a1a1a;display:flex;align-items:center;justify-content:center;padding:40px 40px 40px 300px;}
+.sidebar{position:fixed;top:0;left:0;width:260px;height:100vh;background:#1f2937;color:#fff;padding:20px;overflow:auto;}
+.sidebar .logo{font-size:20px;margin-bottom:30px;color:#fff;}
+.menu{list-style:none;padding:0;}
+.menu a{display:block;color:#fff;text-decoration:none;padding:12px 10px;margin-bottom:8px;border-radius:6px;}
+.menu a:hover{background:#374151;}
+.card{max-width:980px;width:100%;background:#fff;border:1px solid #e5e7eb;border-radius:24px;box-shadow:0 20px 60px rgba(15,23,42,0.08);padding:48px;}
+.eyebrow{color:#2b6df6;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;}
+h1{font-size:40px;margin-bottom:12px;}
+.lead{font-size:16px;line-height:1.8;color:#4b5563;margin-bottom:32px;}
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px;}
+.tab{display:inline-block;padding:10px 14px;border-radius:999px;text-decoration:none;font-size:14px;font-weight:700;background:#eef2ff;color:#1d4ed8;}
+.tab.active{background:#2b6df6;color:#fff;}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;}
+.field{display:flex;flex-direction:column;gap:8px;}
+.field.full{grid-column:1 / -1;}
+label{font-size:13px;font-weight:700;color:#374151;}
+input,select,textarea{border:1px solid #d1d5db;border-radius:12px;padding:14px 16px;font-size:14px;background:#fff;color:#111827;}
+textarea{min-height:140px;resize:vertical;}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;}
+.btn{display:inline-block;text-decoration:none;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:700;}
+.primary{background:#2b6df6;color:#fff;}
+.secondary{background:#eef2ff;color:#1d4ed8;}
+.ghost{background:#f3f4f6;color:#374151;}
+.summary{margin-top:28px;padding:20px;border-radius:16px;background:#f8fafc;border:1px solid #e5e7eb;}
+.summary h2{font-size:18px;margin-bottom:12px;}
+.summary ul{padding-left:18px;color:#4b5563;line-height:1.9;}
+@media (max-width: 900px){body{padding-left:0;padding:20px;}.sidebar{position:static;width:100%;height:auto;margin-bottom:20px;}.card{padding:24px;}.form-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+  <aside class="sidebar">
+    <h2 class="logo">SampleSaaS</h2>
+    <ul class="menu">
+      <li><a href="../apply.html">申請する</a></li>
+      <li><a href="../proxy-apply.html">代理申請する</a></li>
+      <li><a href="../my-applications.html">自分の申請</a></li>
+      <li><a href="../approvals.html">承認する</a></li>
+      <li><a href="../proxy-approvals.html">代理承認する</a></li>
+      <li><a href="../viewable-applications.html">閲覧できる申請</a></li>
+      <li><a href="../invoices.html">回収した請求書</a></li>
+      <li><a href="../all-applications.html">すべての申請</a></li>
+      <li><a href="../routes-forms.html">経路・フォーム</a></li>
+      <li><a href="../admin-settings.html">管理者設定</a></li>
+      <li><a href="../accounting-features.html">経理機能</a></li>
+    </ul>
+  </aside>
+
+  <main class="card">
+    <div class="eyebrow">Request</div>
+    <h1>請求書を作成</h1>
+    <p class="lead">取引先ごとの請求書を作成する画面です。件名、請求金額、支払期限、明細を入力して発行できます。</p>
+
+    <div class="tabs">
+      <a class="tab active" href="invoice.html">請求書</a>
+      <a class="tab" href="receipt.html">領収書</a>
+    </div>
+
+    <form>
+      <div class="form-grid">
+        <div class="field">
+          <label for="client">取引先名</label>
+          <input id="client" type="text" placeholder="株式会社サンプル" />
+        </div>
+        <div class="field">
+          <label for="invoice-no">請求番号</label>
+          <input id="invoice-no" type="text" placeholder="INV-2026-031" />
+        </div>
+        <div class="field">
+          <label for="issue-date">発行日</label>
+          <input id="issue-date" type="date" />
+        </div>
+        <div class="field">
+          <label for="due-date">支払期限</label>
+          <input id="due-date" type="date" />
+        </div>
+        <div class="field">
+          <label for="amount">請求金額</label>
+          <input id="amount" type="text" placeholder="¥120,000" />
+        </div>
+        <div class="field">
+          <label for="tax">税区分</label>
+          <select id="tax">
+            <option>課税 10%</option>
+            <option>軽減 8%</option>
+            <option>非課税</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="subject">件名</label>
+          <input id="subject" type="text" placeholder="2026年3月分 システム保守費用" />
+        </div>
+        <div class="field full">
+          <label for="details">明細</label>
+          <textarea id="details" placeholder="1. 基本保守費用\n2. オプション開発費用\n3. 消費税"></textarea>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" type="submit">請求書を発行</button>
+        <a class="btn secondary" href="../../index.html">ダッシュボードへ戻る</a>
+        <a class="btn ghost" href="../../login/signup.html">無料で試す</a>
+      </div>
+    </form>
+
+    <section class="summary">
+      <h2>この画面でできること</h2>
+      <ul>
+        <li>取引先ごとの請求情報をまとめて入力できます。</li>
+        <li>請求番号や支払期限を指定して、管理しやすい形にできます。</li>
+        <li>明細を入力して、そのまま発行フローに進めます。</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
