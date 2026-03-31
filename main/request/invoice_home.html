@@ -27,6 +27,8 @@ tr:last-child td{border-bottom:none;}
 .primary{background:#2b6df6;color:#fff;}
 .secondary{background:#eef2ff;color:#1d4ed8;}
 .ghost{background:#f3f4f6;color:#374151;}
+.danger{background:#fee2e2;color:#b91c1c;}
+.danger:hover{background:#fecaca;}
 .empty-state{padding:28px;border:1px dashed #cbd5e1;border-radius:16px;background:#f8fafc;color:#475569;text-align:center;}
 .case-link{color:#1d4ed8;text-decoration:none;font-weight:700;}
 </style>
@@ -80,7 +82,7 @@ tr:last-child td{border-bottom:none;}
   </main>
 
   <script type="module">
-    import { collection, db, getDocs, orderBy, query } from './firebase.js';
+    import { collection, db, deleteDoc, doc, getDocs, orderBy, query } from './firebase.js';
 
     const list = document.getElementById('invoice-list');
     const emptyState = document.getElementById('empty-state');
@@ -116,9 +118,32 @@ tr:last-child td{border-bottom:none;}
           <td>${formatDate(item.dueDate)}</td>
           <td>${formatAmount(item.amount)}</td>
           <td><span class="status">${item.status || '保存済み'}</span></td>
-          <td><a class="btn primary" href="invoice.html?docId=${item.id}">請求書を作る</a></td>
+          <td style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a class="btn primary" href="invoice.html?docId=${item.id}">編集</a>
+            <button class="btn danger" type="button" data-delete-id="${item.id}">削除</button>
+          </td>
         `;
         list.appendChild(tr);
+      });
+
+      list.querySelectorAll('[data-delete-id]').forEach((button) => {
+        button.addEventListener('click', async () => {
+          const docId = button.getAttribute('data-delete-id');
+          const target = rows.find((row) => row.id === docId);
+          const label = target?.company ? `「${target.company}」` : 'この請求書';
+
+          if (!window.confirm(`${label} を削除します。よろしいですか？`)) {
+            return;
+          }
+
+          try {
+            await deleteDoc(doc(db, 'invoices', docId));
+            window.location.reload();
+          } catch (error) {
+            console.error(error);
+            alert('削除に失敗しました。');
+          }
+        });
       });
     };
 
