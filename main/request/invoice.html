@@ -111,7 +111,7 @@ textarea{min-height:140px;resize:vertical;}
       </div>
 
       <div class="actions">
-        <button class="btn primary" type="submit">請求書を発行</button>
+        <button class="btn primary" type="submit" id="submit-button">請求書を発行</button>
         <a class="btn secondary" href="../../index.html">ダッシュボードへ戻る</a>
         <a class="btn ghost" href="../../login/signup.html">無料で試す</a>
       </div>
@@ -127,16 +127,30 @@ textarea{min-height:140px;resize:vertical;}
     </section>
   </main>
 
-  <script>
+  <script type="module">
+    import { addDoc, collection, db, doc, getDoc, serverTimestamp, updateDoc } from './firebase.js';
+
     const params = new URLSearchParams(window.location.search);
+    const docId = params.get('docId');
     const company = params.get('company');
     const due = params.get('due');
     const amount = params.get('amount');
 
     const caseInfo = document.getElementById('case-info');
     const clientInput = document.getElementById('client');
+    const invoiceNoInput = document.getElementById('invoice-no');
+    const issueDateInput = document.getElementById('issue-date');
     const dueInput = document.getElementById('due-date');
     const amountInput = document.getElementById('amount');
+    const taxInput = document.getElementById('tax');
+    const subjectInput = document.getElementById('subject');
+    const detailsInput = document.getElementById('details');
+    const submitButton = document.getElementById('submit-button');
+
+    const getValueText = (value) => {
+      if (value == null || value === '') return '-';
+      return value;
+    };
 
     if (company || due || amount) {
       const parts = [];
@@ -149,25 +163,53 @@ textarea{min-height:140px;resize:vertical;}
       if (amount) amountInput.value = Number(amount).toLocaleString('ja-JP');
     }
 
-    document.querySelector('form').addEventListener('submit', function(event) {
+    if (docId) {
+      const invoiceDoc = await getDoc(doc(db, 'invoices', docId));
+      if (invoiceDoc.exists()) {
+        const invoice = invoiceDoc.data();
+        clientInput.value = invoice.company || clientInput.value;
+        invoiceNoInput.value = invoice.invoiceNo || '';
+        issueDateInput.value = invoice.issueDate || '';
+        dueInput.value = invoice.dueDate || dueInput.value;
+        amountInput.value = invoice.amount || amountInput.value;
+        taxInput.value = invoice.tax || taxInput.value;
+        subjectInput.value = invoice.subject || '';
+        detailsInput.value = invoice.details || '';
+        caseInfo.textContent = `保存済み請求書を編集中: ${getValueText(invoice.company)} / 期限: ${getValueText(invoice.dueDate)} / 金額: ${getValueText(invoice.amount)}`;
+        submitButton.textContent = '請求書を更新';
+      }
+    }
+
+    document.querySelector('form').addEventListener('submit', async (event) => {
       event.preventDefault();
+
       const invoice = {
         company: clientInput.value,
-        invoiceNo: document.getElementById('invoice-no').value,
-        issueDate: document.getElementById('issue-date').value,
+        invoiceNo: invoiceNoInput.value,
+        issueDate: issueDateInput.value,
         dueDate: dueInput.value,
         amount: amountInput.value,
-        tax: document.getElementById('tax').value,
-        subject: document.getElementById('subject').value,
-        details: document.getElementById('details').value,
-        createdAt: new Date().toISOString()
+        tax: taxInput.value,
+        subject: subjectInput.value,
+        details: detailsInput.value,
+        updatedAt: serverTimestamp(),
       };
 
-      const saved = JSON.parse(localStorage.getItem('sampleSaasInvoices') || '[]');
-      saved.push(invoice);
-      localStorage.setItem('sampleSaasInvoices', JSON.stringify(saved));
+      try {
+        if (docId) {
+          await updateDoc(doc(db, 'invoices', docId), invoice);
+        } else {
+          await addDoc(collection(db, 'invoices'), {
+            ...invoice,
+            createdAt: serverTimestamp(),
+          });
+        }
 
-      alert('請求書を保存しました。');
+        window.location.href = 'invoice_home.html';
+      } catch (error) {
+        console.error(error);
+        alert('請求書の保存に失敗しました。');
+      }
     });
   </script>
 </body>

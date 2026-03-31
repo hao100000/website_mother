@@ -27,6 +27,8 @@ tr:last-child td{border-bottom:none;}
 .primary{background:#2b6df6;color:#fff;}
 .secondary{background:#eef2ff;color:#1d4ed8;}
 .ghost{background:#f3f4f6;color:#374151;}
+.empty-state{padding:28px;border:1px dashed #cbd5e1;border-radius:16px;background:#f8fafc;color:#475569;text-align:center;}
+.case-link{color:#1d4ed8;text-decoration:none;font-weight:700;}
 </style>
 </head>
 <body>
@@ -63,35 +65,71 @@ tr:last-child td{border-bottom:none;}
             <th>操作</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>株式会社サンプル</td>
-            <td>2026/04/10</td>
-            <td>¥120,000</td>
-            <td><span class="status">未作成</span></td>
-            <td><a class="btn primary" href="invoice.html?case=sample&company=%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB&due=2026-04-10&amount=120000">請求書を作る</a></td>
-          </tr>
-          <tr>
-            <td>山田商事株式会社</td>
-            <td>2026/04/15</td>
-            <td>¥84,500</td>
-            <td><span class="status">作成中</span></td>
-            <td><a class="btn primary" href="invoice.html?case=yamada&company=%E5%B1%B1%E7%94%B0%E5%95%86%E4%BA%8B%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE&due=2026-04-15&amount=84500">請求書を作る</a></td>
-          </tr>
-          <tr>
-            <td>ABC Logistics</td>
-            <td>2026/04/20</td>
-            <td>¥220,000</td>
-            <td><span class="status">要確認</span></td>
-            <td><a class="btn primary" href="invoice.html?case=abc-logistics&company=ABC%20Logistics&due=2026-04-20&amount=220000">請求書を作る</a></td>
-          </tr>
-        </tbody>
+        <tbody id="invoice-list"></tbody>
       </table>
+    </div>
+
+    <div class="empty-state" id="empty-state" hidden>
+      まだ請求書データがありません。`invoice.html` から保存すると、ここに一覧が表示されます。
     </div>
 
     <div class="actions">
       <a class="btn secondary" href="../apply.html">申請するへ戻る</a>
     </div>
   </main>
+
+  <script type="module">
+    import { collection, db, getDocs, orderBy, query } from './firebase.js';
+
+    const list = document.getElementById('invoice-list');
+    const emptyState = document.getElementById('empty-state');
+
+    const formatAmount = (value) => {
+      const numeric = Number(String(value).replace(/[^\d.-]/g, ''));
+      if (Number.isNaN(numeric) || numeric === 0) {
+        return value || '-';
+      }
+      return `¥${numeric.toLocaleString('ja-JP')}`;
+    };
+
+    const formatDate = (value) => {
+      if (!value) return '-';
+      return String(value).replaceAll('-', '/');
+    };
+
+    const renderRows = (rows) => {
+      list.innerHTML = '';
+
+      if (rows.length === 0) {
+        emptyState.hidden = false;
+        list.innerHTML = '<tr><td colspan="5" style="padding:24px;text-align:center;color:#64748b;">まだ保存された請求書はありません。</td></tr>';
+        return;
+      }
+
+      emptyState.hidden = true;
+
+      rows.forEach((item) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><a class="case-link" href="invoice.html?docId=${item.id}">${item.company || '-'}</a></td>
+          <td>${formatDate(item.dueDate)}</td>
+          <td>${formatAmount(item.amount)}</td>
+          <td><span class="status">${item.status || '保存済み'}</span></td>
+          <td><a class="btn primary" href="invoice.html?docId=${item.id}">請求書を作る</a></td>
+        `;
+        list.appendChild(tr);
+      });
+    };
+
+    try {
+      const snapshot = await getDocs(query(collection(db, 'invoices'), orderBy('createdAt', 'desc')));
+      const rows = snapshot.docs.map((invoiceDoc) => ({ id: invoiceDoc.id, ...invoiceDoc.data() }));
+      renderRows(rows);
+    } catch (error) {
+      emptyState.hidden = false;
+      list.innerHTML = '<tr><td colspan="5" style="padding:24px;text-align:center;color:#b91c1c;">請求書一覧を読み込めませんでした。</td></tr>';
+      console.error(error);
+    }
+  </script>
 </body>
 </html>
