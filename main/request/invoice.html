@@ -118,6 +118,7 @@ textarea{min-height:140px;resize:vertical;}
         <a class="btn secondary" href="../../index.html">ダッシュボードへ戻る</a>
         <a class="btn ghost" href="../../login/signup.html">無料で試す</a>
         <button class="btn danger" type="button" id="delete-button" hidden>請求書を削除</button>
+        <button class="btn secondary" type="button" id="export-csv-button">CSVで出力</button>
       </div>
     </form>
 
@@ -151,6 +152,7 @@ textarea{min-height:140px;resize:vertical;}
     const detailsInput = document.getElementById('details');
     const submitButton = document.getElementById('submit-button');
     const deleteButton = document.getElementById('delete-button');
+    const exportCsvButton = document.getElementById('export-csv-button');
 
     const getValueText = (value) => {
       if (value == null || value === '') return '-';
@@ -216,6 +218,56 @@ textarea{min-height:140px;resize:vertical;}
         console.error(error);
         alert('請求書の保存に失敗しました。');
       }
+    });
+
+    const escapeCsvValue = (value) => {
+      const text = value == null ? '' : String(value);
+      return `"${text.replaceAll('"', '""')}"`;
+    };
+
+    const buildCsv = (invoice) => {
+      const headers = ['company', 'invoiceNo', 'issueDate', 'dueDate', 'amount', 'tax', 'subject', 'details'];
+      const values = [
+        invoice.company,
+        invoice.invoiceNo,
+        invoice.issueDate,
+        invoice.dueDate,
+        invoice.amount,
+        invoice.tax,
+        invoice.subject,
+        invoice.details,
+      ];
+
+      const csvRows = [
+        headers.map(escapeCsvValue).join(','),
+        values.map(escapeCsvValue).join(','),
+      ];
+
+      return `\ufeff${csvRows.join('\n')}`;
+    };
+
+    exportCsvButton.addEventListener('click', () => {
+      const invoice = {
+        company: clientInput.value,
+        invoiceNo: invoiceNoInput.value,
+        issueDate: issueDateInput.value,
+        dueDate: dueInput.value,
+        amount: amountInput.value,
+        tax: taxInput.value,
+        subject: subjectInput.value,
+        details: detailsInput.value,
+      };
+
+      const csv = buildCsv(invoice);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${invoice.company || 'invoice'}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
     });
 
     deleteButton.addEventListener('click', async () => {
